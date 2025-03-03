@@ -8,18 +8,14 @@ class SierpinskiTriangle:
 
     def draw_triangle(self, color, vertices):
         mesh = D.data.meshes.new(name="triangle")
-        # Create a new object using the mesh
         obj = D.data.objects.new("Triangle", mesh)
-        # Link the object to the current collection
         D.context.collection.objects.link(obj)
-        # Set vertices and faces for the mesh
         mesh.from_pydata(vertices, [], [(0, 1, 2)])
         mesh.update()
 
         # Create a new material with the specified color
         color_material = D.data.materials.new(name="Color")
         color_material.diffuse_color = color
-        # Assign the material to the mesh
         mesh.materials.append(color_material)
 
     def clip_polygon(self, subject_polygon, clipping_polygon):
