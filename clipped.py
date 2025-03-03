@@ -12,8 +12,6 @@ class SierpinskiTriangle:
         D.context.collection.objects.link(obj)
         mesh.from_pydata(vertices, [], [(0, 1, 2)])
         mesh.update()
-
-        # Create a new material with the specified color
         color_material = D.data.materials.new(name="Color")
         color_material.diffuse_color = color
         mesh.materials.append(color_material)
@@ -39,20 +37,17 @@ class SierpinskiTriangle:
 
                     if intersection[0] == -1.0:
                         output_polygon.append(intersection)
-                        if subject_end[0] >= 0:  # Check if next vertex is inside clipping region
+                        if subject_end[0] >= 0:  
                             output_polygon.append(subject_end)
                     elif intersection[0] == -2.0:
                         output_polygon.append(intersection)
-                    else:  # Exiting case (intersection.x == -3.0)
-                        # Add the remaining part of the subject polygon to the output
+                    else:  
                         if subject_end[0] >= intersection[0]:
                             output_polygon.append(subject_end)
 
             subject = output_polygon
 
-        # Final step for backward clipping: reverse the output polygon
         result = output_polygon[::-1]
-
         # Keep only points inside the clipping region
         for point in result:
             if point[0] >= 0:
@@ -72,21 +67,18 @@ class SierpinskiTriangle:
         s2_y = y4[0] - y3[0]
 
         denom = s1_x * s2_y - s2_x * s1_y
-        if denom == 0:  # Lines are parallel
+        if denom == 0: 
             return None
 
         s = (-s1_y * (x1 - x3) + s1_x * (y1 - y3)) / denom
         t = (s2_x * (y1 - y3) - s2_y * (x1 - x3)) / denom
 
         if 0 <= s <= 1 and 0 <= t <= 1:
-            # Intersection exists
             intersection_x = x1 + (t * s1_x)
             intersection_y = y1 + (t * s1_y)
             return intersection_x, intersection_y
         else:
-            return None  # No intersectioncf
-
-
+            return None 
     def classify_intersection(self, intersection, edge_start, edge_end, clip_vertex):
         dx = edge_end[0] - edge_start[0]
         dy = edge_end[1] - edge_start[1]
@@ -100,17 +92,16 @@ class SierpinskiTriangle:
             elif dx < 0 and clip_vertex[1] > edge_start[1]:
                 intersection[0] = -2.0  # Entering
             else:
-                intersection[0] = -3.0  # Exiting
+                intersection[0] = -3.0  
         elif cross_product > 0:
-            intersection[0] = -1.0  # Entering
+            intersection[0] = -1.0 
         else:
-            intersection[0] = -3.0  # Exiting
+            intersection[0] = -3.0  
 
     def sierpinski(self, x, y, z, depth, clipping_polygon=None):
         if depth == 0:
-            # Clip the triangle even for depth 0
             clipped_triangle = self.clip_polygon([[x, y, z]], clipping_polygon) if clipping_polygon else [[x, y, z]]
-            if clipped_triangle:  # Only draw if clipping produced a valid triangle
+            if clipped_triangle:
                 self.draw_triangle(random.choice(self.colors), clipped_triangle[0])
         else:
             mid1 = [(x[0] + y[0]) / 2, (x[1] + y[1]) / 2, (x[2] + z[2]) / 2]
@@ -123,10 +114,8 @@ class SierpinskiTriangle:
             self.sierpinski(mid3, mid2, z, depth - 1, clipping_polygon)
 
     def generate_fractal(self, depth, clipping_polygon=None):
-        # Generate Sierpinski triangle with clipping only for the first triangle
         self.sierpinski(self.base_triangle_vertices[0], self.base_triangle_vertices[1], self.base_triangle_vertices[2], depth, clipping_polygon)
 
-# Example usage with a clipping polygon
-clipping_polygon = [(-4, 0, 0), (4, 0, 0), (0, 4, 0)]  # Example clip region
+clipping_polygon = [(-4, 0, 0), (4, 0, 0), (0, 4, 0)] 
 sierpinski_triangle = SierpinskiTriangle()
 sierpinski_triangle.generate_fractal(5, clipping_polygon)
